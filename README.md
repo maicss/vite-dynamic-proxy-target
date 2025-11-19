@@ -1,5 +1,33 @@
 # Vue 3 + Vite
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+动态 proxy 的尝试
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+尝试了 bypass 直接返回 url：
+```js
+bypass: (req, res) => {
+  console.log("bypass handler", req.url);
+  if (req.headers[mockHeader] === "true") {
+    return apifox + req.url;
+  } else {
+    return false;
+  }
+}
+```
+
+尝试了 configure 重写 target:
+```js
+configure: (req, res) => {
+  console.log("configure handler", req.url);
+  if (req.headers[mockHeader] === "true") {
+    const mockUrlObj = new URL(apifox);
+    proxyReq.setHeader('Host', mockUrlObj.host);
+    proxyReq.path = req.url!.replace(/^\/api/, "");
+  } else {
+    return false;
+  }
+}
+```
+
+以上方案均失败。
+
+实际代码里也是不成功的 :(
